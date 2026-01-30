@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
@@ -7,33 +7,28 @@ def calculator():
     result = ""
 
     if request.method == "POST":
-        values = request.form.getlist("numbers")
-        numbers = [float(v) for v in values if v != ""]
+        try:
+            num1 = float(request.form["num1"])
+            num2 = float(request.form["num2"])
+            operation = request.form["operation"]
 
-        operation = request.form["operation"]
+            if operation == "add":
+                result = num1 + num2
+            elif operation == "sub":
+                result = num1 - num2
+            elif operation == "mul":
+                result = num1 * num2
+            elif operation == "div":
+                if num2 == 0:
+                    result = "Cannot divide by zero"
+                else:
+                    result = num1 / num2
 
-        if operation == "add":
-            result = sum(numbers)
-
-        elif operation == "mul":
-            result = 1
-            for n in numbers:
-                result *= n
-
-        elif operation == "sub":
-            result = numbers[0]
-            for n in numbers[1:]:
-                result -= n
-
-        elif operation == "div":
-            result = numbers[0]
-            for n in numbers[1:]:
-                if n == 0:
-                    result = "Error: Division by zero"
-                    break
-                result /= n
+        except Exception as e:
+            result = "Error: " + str(e)
 
     return render_template("index.html", result=result)
+
 
 if __name__ == "__main__":
     app.run()
